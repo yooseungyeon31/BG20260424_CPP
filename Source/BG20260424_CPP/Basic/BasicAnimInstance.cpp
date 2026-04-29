@@ -39,5 +39,8 @@ void UBasicAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 		{
 			CurrentBigHeadScale = FMath::FInterpTo(CurrentBigHeadScale, 1.0f, DeltaSeconds, 10.0f);
 		}
+
+		AimPitch = Player->GetAimOffset().Pitch;
+		AimYaw = Player->GetAimOffset().Yaw;
 	}
 }

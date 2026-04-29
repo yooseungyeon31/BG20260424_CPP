@@ -110,5 +110,16 @@ void ABasicPlayer::Lean(const FInputActionValue& Value)
 
 }
 
+FRotator ABasicPlayer::GetAimOffset() const
+{
+	//AimRotation World -> Local
+	const FVector AimDirWorldSpace = GetBaseAimRotation().Vector();
+	const FVector AimDirLocalSpace = ActorToWorld().InverseTransformVectorNoScale(AimDirWorldSpace);
+	const FVector AimRotLocalSpace = AimDirLocalSpace.Rotation();
+
+	return AimRotLocalSpace;
+
+}
+
 
 

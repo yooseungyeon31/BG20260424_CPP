@@ -68,6 +68,9 @@ public:
 
 	void Lean(const FInputActionValue& Value);
 
+	FRotator GetAimOffset();
+
+
 	
 
 };
