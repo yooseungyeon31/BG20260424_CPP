@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../BG20260424_CPP.h"
 
@@ -77,6 +78,8 @@ void ABasicPlayer::BigHead()
 
 }
 
+
+
 void ABasicPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D Direction = Value.Get<FVector2D>();
@@ -110,16 +113,92 @@ void ABasicPlayer::Lean(const FInputActionValue& Value)
 
 }
 
+
 FRotator ABasicPlayer::GetAimOffset() const
 {
-	//AimRotation World -> Local
+	//AimRotaion World->Local
+
 	const FVector AimDirWorldSpace = GetBaseAimRotation().Vector();
 	const FVector AimDirLocalSpace = ActorToWorld().InverseTransformVectorNoScale(AimDirWorldSpace);
-	const FVector AimRotLocalSpace = AimDirLocalSpace.Rotation();
+	const FRotator AimRotLocalSpace = AimDirLocalSpace.Rotation();
 
 	return AimRotLocalSpace;
-
 }
+
+
+//몽타주 콤보 넣기
+//1번되면 첫번쨰 몽타주 실행하고 AnimNotify_CheckCombo_CPP여기서 ApplyCombo 호출, 또 3번까지 반복
+//되는 구조
+//void ABasicPlayer::ApplyCombo()
+//{
+//	ComboCount = 0;
+//	ComboCount = FMath::Clamp(ComboCount, 0, 3);
+//
+//	
+//
+//	FString SectionName = FString::Printf(TEXT("Attack0%d"), ComboCount);
+//
+//	PlayAnimMontage(ComboMontage, 1.0f, FName(SectionName));
+//
+//
+//	
+//
+//}
+
+void ABasicPlayer::CheckCombo()
+{
+	if (PlayingComboIndex != ComboCount)
+	{
+		PlayComboMontage();
+		PlayingComboIndex = ComboCount;
+	}
+}
+
+void ABasicPlayer::ComboAttack()
+{
+
+	if (!bIsAttacking)
+	{
+		ComboCount++;
+
+		PlayComboMontage();
+
+		bIsAttacking = true;
+
+		PlayingComboIndex = ComboCount;
+	}
+	else if (bIsAttacking && PlayingComboIndex == ComboCount)
+	{
+		ComboCount++;
+	}
+}
+
+void ABasicPlayer::PlayComboMontage()
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		FString SectionName = FString::Printf(TEXT("Attack0%d"), ComboCount);
+
+		float MontageLength = PlayAnimMontage(ComboMontage, 1.0f, FName(SectionName));
+
+		if (MontageLength > 0)
+		{
+			FOnMontageEnded EndDelegate;
+
+			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted) {
+				if (!bInterrupted)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("EndDelegate"));
+					ComboCount = 0;
+					PlayingComboIndex = 0;
+					bIsAttacking = false;
+				}
+				});
+			AnimInstance->Montage_SetEndDelegate(EndDelegate);
+		}
+	}
+}
+
 
 
 

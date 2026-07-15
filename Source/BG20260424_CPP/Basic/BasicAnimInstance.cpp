@@ -42,5 +42,19 @@ void UBasicAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 
 		AimPitch = Player->GetAimOffset().Pitch;
 		AimYaw = Player->GetAimOffset().Yaw;
+		
+
+		bIsWeaponEquipped = Player->bIsWeaponEquipped;
+		CurrentPoseState = Player->CurrentPoseState;
 	}
 }
+
+void UBasicAnimInstance::AnimNotify_CheckCombo_SK_CPP(UAnimNotify* Notify)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AnimNotify"));
+}
+
+//void UBasicAnimInstance::AnimNotify_CheckCombo_CPP()
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("AnimNotify"));
+//}

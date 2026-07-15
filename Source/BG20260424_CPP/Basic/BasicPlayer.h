@@ -11,6 +11,15 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 
+UENUM(BlueprintType)
+enum class EPoseState : uint8
+{
+	Stand = 0 UMETA(DisplayName = "Stand"),
+	Crouch = 10 UMETA(DisplayName = "Crouch"),
+	Prone = 20 UMETA(DisplayName = "Prone")
+};
+
+
 UCLASS()
 class BG20260424_CPP_API ABasicPlayer : public ACharacter
 {
@@ -54,6 +63,14 @@ public:
 	UFUNCTION(Exec)
 	void BigHead();
 
+	void Move(const FInputActionValue& Value);
+
+	void Look(const FInputActionValue& Value);
+
+	void Lean(const FInputActionValue& Value);
+
+	FRotator GetAimOffset() const;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	float TargetLeanAngle;
@@ -61,14 +78,39 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 bIsBigHead : 1 = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	EPoseState CurrentPoseState = EPoseState::Stand;
 
-	void Move(const FInputActionValue& Value);
 
-	void Look(const FInputActionValue& Value);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 bIsWeaponEquipped : 1 = false;
 
-	void Lean(const FInputActionValue& Value);
 
-	FRotator GetAimOffset();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 ComboCount = 0;
+
+	
+
+	UFUNCTION(BlueprintCallable)
+	void CheckCombo();
+
+	UFUNCTION(BlueprintCallable)
+	void ComboAttack();
+
+	void PlayComboMontage();
+
+
+	//몽타주 쓰도록 설정
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	TObjectPtr<UAnimMontage> ComboMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 bIsAttacking : 1 = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 PlayingComboIndex = 0;
+
+	
 
 
 	
